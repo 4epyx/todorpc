@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package todo;
+
+service TaskService {
+    rpc CreateTask(TaskRequest) returns (Task) {}
+    rpc GetAllTasks(GetTasksRequest) returns (ShortTasks) {}
+    rpc GetFullTaskInfo(TaskId) returns (Task) {}
+    rpc SetTaskCompleted(TaskId) returns (Task) {}
+    rpc SetTaskUncompleted(TaskId) returns (Task) {}
+    rpc UpdateTask(TaskToUpdate) returns (Task) {}
+    rpc DeleteTask(TaskId) returns (Task) {}
+}
+
+message TaskRequest {
+    string title = 1;
+    string description = 2;
+    int64 deadline = 3;
+}
+
+message Task {
+    int64 id = 1;
+    string title = 2;
+    string description = 3;
+    int64 deadline = 4;
+    int64 created_at = 5;
+    int64 completed_at = 6;
+}
+
+message ShortTask {
+    int64 id = 1;
+    string title = 2;
+    int64 deadline = 3;
+    int64 created_at = 4;
+    int64 completed_at = 5;
+}
+
+message ShortTasks {
+    repeated ShortTask tasks = 1;
+    int32 count = 2;
+}
+
+message GetTasksRequest {
+    SortBy sortBy = 1;
+    bool showCompleted = 2;
+}
+
+enum SortBy {
+    ID = 0;
+    TITLE = 1;
+    DEADLINE = 2;
+    CREATED_AT = 3;
+}
+
+message TaskId {
+    int64 id = 1;
+}
+
+message TaskToUpdate {
+    int64 id = 1;
+    string title = 2;
+    string description = 3;
+    int64 deadline = 4;
+}
