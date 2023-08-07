@@ -10,20 +10,20 @@ type TaskRepository interface {
 }
 
 type TaskReader interface {
-	GetAllTasks(*pb.GetTasksRequest) *pb.ShortTasks
-	GetFullTaskInfo(int64) *pb.Task
+	GetAllTasks(*pb.GetTasksRequest, int64 /*user id*/) *pb.ShortTasks
+	GetFullTaskInfo(int64 /*task id*/, int64 /*user id*/) *pb.Task
 }
 
 type TaskCreator interface {
-	CreateTask(*pb.TaskRequest) pb.Task
+	CreateTask(*pb.TaskRequest, int64 /*user id*/) pb.Task
 }
 
 type TaskUpdater interface {
-	SetTaskCompleted(int64) *pb.Task
-	SetTaskUncompleted(int64) *pb.Task
-	UpdateTask(*pb.TaskToUpdate) *pb.Task
+	SetTaskCompleted(int64 /*task id*/, int64 /*user id*/) *pb.Task
+	SetTaskUncompleted(int64 /*task id*/, int64 /*user id*/) *pb.Task
+	UpdateTask(*pb.TaskToUpdate, int64 /*user id*/) *pb.Task
 }
 
 type TaskDeleter interface {
-	DeleteTask(int64) *pb.Task
+	DeleteTask(int64 /*task id*/, int64 /*user id*/) *pb.Task
 }
