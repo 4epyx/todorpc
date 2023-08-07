@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "github.com/4epyx/todorpc/pb";
+
 package todo;
 
 service TaskService {
