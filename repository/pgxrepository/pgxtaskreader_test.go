@@ -102,6 +102,26 @@ func (t *TestPgxReader) TestGetUncompletedTasks() {
 	t.Equal(len(res.Tasks), 1)
 }
 
+func (t *TestPgxReader) TestGetOneTask() {
+	expected := &pb.Task{
+		Id:          1,
+		Title:       "full task",
+		Description: "description",
+		Deadline:    1691998920,
+		CreatedAt:   1691491320,
+		CompletedAt: 1691492320,
+	}
+
+	got, err := t.reader.GetFullTaskInfo(t.ctx, 1, 1)
+	t.Nil(err)
+	t.Equal(expected, got)
+}
+
+func (t *TestPgxReader) TestGetNotExistingTask() {
+	_, err := t.reader.GetFullTaskInfo(t.ctx, 10, 1)
+	t.NotNil(err)
+}
+
 func TestPgxReaderSuit(t *testing.T) {
 	test := new(TestPgxReader)
 	suite.Run(t, test)
