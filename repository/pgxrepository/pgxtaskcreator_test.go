@@ -2,11 +2,9 @@ package pgxtaskrepo_test
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
-	"github.com/4epyx/todorpc/db"
 	"github.com/4epyx/todorpc/pb"
 	pgxrepo "github.com/4epyx/todorpc/repository/pgxrepository"
 	"github.com/4epyx/todorpc/util/testutil"
@@ -14,59 +12,49 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type TestPgxRepository struct {
+type TestPgxCreator struct {
 	suite.Suite
-	db   *pgxpool.Pool
-	repo *pgxrepo.PgxTaskCreator
-	ctx  context.Context
+	db      *pgxpool.Pool
+	creator *pgxrepo.PgxTaskCreator
+	ctx     context.Context
 }
 
-func (t *TestPgxRepository) SetupTest() {
-	dbUrl, ok := os.LookupEnv("TEST_DB_URL")
-	if !ok {
-		t.T().Fatal("test db url not found in environment variable")
-	}
-
-	t.ctx = context.Background()
-
+func (t *TestPgxCreator) SetupTest() {
 	var err error
-	t.db, err = db.ConnectToDB(t.ctx, dbUrl)
+	t.db, t.ctx, err = testutil.SetupTestDbConn()
 	if err != nil {
-		t.T().Fatalf("can not connect to db: %v", err)
+		t.T().Fatal(err)
 	}
 
-	if err := db.MigrateTaskTable(t.ctx, t.db); err != nil {
-		t.T().Fatalf("can not migrate to db: %v", err)
-	}
-	t.repo = pgxrepo.NewPgxTaskCreator(t.db)
+	t.creator = pgxrepo.NewPgxTaskCreator(t.db)
 }
 
-func (t *TestPgxRepository) TestCreateValidTask() {
+func (t *TestPgxCreator) TestCreateValidTask() {
 	validTask := &pb.TaskRequest{
 		Title:       "Task 1",
 		Description: "task1 description",
 		Deadline:    time.Now().Add(time.Hour * 24).Unix(),
 	}
-	_, err := t.repo.CreateTask(t.ctx, validTask, 1)
+	_, err := t.creator.CreateTask(t.ctx, validTask, 1)
 	t.Nil(err)
 }
 
-func (t *TestPgxRepository) TestCreateInvalidTask() {
+func (t *TestPgxCreator) TestCreateInvalidTask() {
 	invalidTask := &pb.TaskRequest{
 		Description: "task2 description",
 		Deadline:    time.Now().Add(time.Hour * 24).Unix(),
 	}
-	_, err := t.repo.CreateTask(t.ctx, invalidTask, 1)
+	_, err := t.creator.CreateTask(t.ctx, invalidTask, 1)
 	t.NotNil(err)
 }
 
-func (t *TestPgxRepository) TestCreateTaskWithSqlInjection() {
+func (t *TestPgxCreator) TestCreateTaskWithSqlInjection() {
 	injTask := &pb.TaskRequest{
 		Title:       "Task 3",
 		Description: "description'); DROP TABLE tasks;",
 	}
 
-	_, err := t.repo.CreateTask(t.ctx, injTask, 1)
+	_, err := t.creator.CreateTask(t.ctx, injTask, 1)
 	t.Nil(err)
 
 	tables, err := testutil.GetAllTables(t.ctx, t.db)
@@ -85,8 +73,18 @@ func (t *TestPgxRepository) TestCreateTaskWithSqlInjection() {
 	t.True(found)
 }
 
+func (t *TestPgxCreator) TestCreateTaskWithSpecialChars() {
+	scharsTask := &pb.TaskRequest{
+		Title:       "Task 3",
+		Description: "$8",
+	}
+
+	_, err := t.creator.CreateTask(t.ctx, scharsTask, 1)
+	t.Nil(err)
+}
+
 func TestCreateTaskSuite(t *testing.T) {
-	test := new(TestPgxRepository)
+	test := new(TestPgxCreator)
 	suite.Run(t, test)
 	test.db.Exec(context.Background(), "DROP TABLE IF EXISTS tasks")
 }
