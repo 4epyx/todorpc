@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/4epyx/todorpc/db"
+	"github.com/4epyx/todorpc/util/testutil"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/suite"
 )
@@ -13,22 +14,6 @@ import (
 type TestMigrateToDb struct {
 	suite.Suite
 	conn *pgxpool.Pool
-}
-
-func getAllTables(ctx context.Context, db *pgxpool.Pool) ([]string, error) {
-	res, err := db.Query(ctx, "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'")
-	if err != nil {
-		return nil, err
-	}
-
-	tables := make([]string, 0, 5)
-	for res.Next() {
-		var table string
-		res.Scan(&table)
-		tables = append(tables, table)
-	}
-
-	return tables, nil
 }
 
 func (t *TestMigrateToDb) SetupTest() {
@@ -49,7 +34,7 @@ func (t *TestMigrateToDb) TestMigrateTable() {
 	t.Nil(err)
 	defer t.conn.Exec(context.Background(), "DROP TABLE tasks")
 
-	tables, err := getAllTables(context.Background(), t.conn)
+	tables, err := testutil.GetAllTables(context.Background(), t.conn)
 	t.Nil(err)
 
 	found := false
