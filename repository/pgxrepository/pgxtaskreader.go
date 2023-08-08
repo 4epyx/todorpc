@@ -25,11 +25,13 @@ func (r *PgxTaskReader) GetAllTasks(ctx context.Context, req *pb.GetTasksRequest
 	if err != nil {
 		return nil, err
 	}
-	tasks := make([]*pb.ShortTask, rows.CommandTag().RowsAffected())
+	tasks := make([]*pb.ShortTask, 0)
 	for i := 0; rows.Next(); i++ {
-		if err := rows.Scan(&tasks[i].Id, &tasks[i].Title, &tasks[i].Deadline, &tasks[i].CreatedAt, &tasks[i].CompletedAt); err != nil {
+		task := &pb.ShortTask{}
+		if err := rows.Scan(&task.Id, &task.Title, &task.Deadline, &task.CreatedAt, &task.CompletedAt); err != nil {
 			return nil, err
 		}
+		tasks = append(tasks, task)
 	}
 
 	return &pb.ShortTasks{
@@ -40,9 +42,9 @@ func (r *PgxTaskReader) GetAllTasks(ctx context.Context, req *pb.GetTasksRequest
 
 func (r *PgxTaskReader) buildGetAllTasksQuery(showCompleted bool, sortBy pb.SortBy) string {
 	query := &strings.Builder{}
-	query.WriteString("SELECT id, title, deadline, created_at, completed_at FROM tasks WHERE user_id = $1")
+	query.WriteString("SELECT id, title, deadline, created_at, completed_at FROM tasks WHERE user_id = $1 AND deleted_at IS NULL")
 	if !showCompleted {
-		query.WriteString(" AND completed_at IS NULL")
+		query.WriteString(" AND completed_at = 0")
 	}
 
 	query.WriteString(" ORDER BY ")
