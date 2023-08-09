@@ -41,7 +41,7 @@ func (r *PgxTaskReader) GetAllTasks(ctx context.Context, req *pb.GetTasksRequest
 
 func (r *PgxTaskReader) buildGetAllTasksQuery(showCompleted bool, sortBy pb.SortBy) string {
 	query := &strings.Builder{}
-	query.WriteString("SELECT id, title, deadline, created_at, completed_at FROM tasks WHERE user_id = $1 AND deleted_at IS NULL")
+	query.WriteString("SELECT id, title, deadline, created_at, completed_at FROM tasks WHERE deleted_at IS NULL AND user_id = $1 AND deleted_at IS NULL")
 	if !showCompleted {
 		query.WriteString(" AND completed_at = 0")
 	}
@@ -65,7 +65,7 @@ func (r *PgxTaskReader) buildGetAllTasksQuery(showCompleted bool, sortBy pb.Sort
 
 func (r *PgxTaskReader) GetFullTaskInfo(ctx context.Context, taskId int64, userId int64) (*pb.Task, error) {
 	task := &pb.Task{}
-	if err := r.db.QueryRow(ctx, "SELECT id, title, description, deadline, created_at, completed_at FROM tasks WHERE id = $1 AND user_id = $2", taskId, userId).
+	if err := r.db.QueryRow(ctx, "SELECT id, title, description, deadline, created_at, completed_at FROM tasks WHERE deleted_at IS NULL AND id = $1 AND user_id = $2", taskId, userId).
 		Scan(&task.Id, &task.Title, &task.Description, &task.Deadline, &task.CreatedAt, &task.CompletedAt); err != nil {
 		return nil, err
 	}

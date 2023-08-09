@@ -44,7 +44,7 @@ func (t *TestPgxReader) TestGetAllTasksSortById() {
 	res, err := t.reader.GetAllTasks(t.ctx, req, 1)
 
 	t.Nil(err)
-	t.Equal(len(res.Tasks), 5)
+	t.Equal(len(res.Tasks), 6)
 	t.True(sort.SliceIsSorted(res.Tasks, func(i, j int) bool {
 		return res.Tasks[i].Id < res.Tasks[j].Id
 	}))
@@ -58,7 +58,7 @@ func (t *TestPgxReader) TestGetAllTasksSortByTitle() {
 	res, err := t.reader.GetAllTasks(t.ctx, req, 1)
 
 	t.Nil(err)
-	t.Equal(len(res.Tasks), 5)
+	t.Equal(len(res.Tasks), 6)
 	t.True(sort.SliceIsSorted(res.Tasks, func(i, j int) bool {
 		return res.Tasks[i].Title < res.Tasks[j].Title
 	}))
@@ -72,7 +72,7 @@ func (t *TestPgxReader) TestGetAllTasksSortByDeadline() {
 	res, err := t.reader.GetAllTasks(t.ctx, req, 1)
 
 	t.Nil(err)
-	t.Equal(len(res.Tasks), 5)
+	t.Equal(len(res.Tasks), 6)
 	t.True(sort.SliceIsSorted(res.Tasks, func(i, j int) bool {
 		return res.Tasks[i].Deadline < res.Tasks[j].Deadline
 	}))
@@ -86,7 +86,7 @@ func (t *TestPgxReader) TestGetAllTasksSortByCreatedAt() {
 	res, err := t.reader.GetAllTasks(t.ctx, req, 1)
 
 	t.Nil(err)
-	t.Equal(len(res.Tasks), 5)
+	t.Equal(len(res.Tasks), 6)
 	t.True(sort.SliceIsSorted(res.Tasks, func(i, j int) bool {
 		return res.Tasks[i].CreatedAt < res.Tasks[j].CreatedAt
 	}))
@@ -99,7 +99,7 @@ func (t *TestPgxReader) TestGetUncompletedTasks() {
 	res, err := t.reader.GetAllTasks(t.ctx, req, 1)
 
 	t.Nil(err)
-	t.Equal(len(res.Tasks), 1)
+	t.Equal(len(res.Tasks), 2)
 }
 
 func (t *TestPgxReader) TestGetOneTask() {
@@ -119,6 +119,11 @@ func (t *TestPgxReader) TestGetOneTask() {
 
 func (t *TestPgxReader) TestGetNotExistingTask() {
 	_, err := t.reader.GetFullTaskInfo(t.ctx, 10, 1)
+	t.NotNil(err)
+}
+
+func (t *TestPgxReader) TestGetDeletedTask() {
+	_, err := t.reader.GetFullTaskInfo(t.ctx, 9, 1)
 	t.NotNil(err)
 }
 
