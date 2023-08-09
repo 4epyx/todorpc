@@ -3,8 +3,8 @@ package pgxtaskrepo
 import (
 	"context"
 	"errors"
+	"time"
 
-	"github.com/4epyx/todorpc/pb"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -18,6 +18,14 @@ func NewPgxTaskDeleter(db *pgxpool.Pool) *PgxTaskDeleter {
 	}
 }
 
-func (d *PgxTaskDeleter) DeleteTask(ctx context.Context, taskId int64, userId int64) (*pb.Task, error) {
-	return nil, errors.New("not implemented")
+func (d *PgxTaskDeleter) DeleteTask(ctx context.Context, taskId int64, userId int64) error {
+	res, err := d.db.Exec(ctx, "UPDATE tasks SET deleted_at = $1 WHERE deleted_at IS NULL AND id = $2 AND user_id = $3", time.Now().Unix(), taskId, userId)
+	if err != nil {
+		return err
+	}
+
+	if res.RowsAffected() == 0 {
+		return errors.New("task not found")
+	}
+	return nil
 }
