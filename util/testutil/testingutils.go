@@ -60,7 +60,11 @@ func LoadDump(ctx context.Context, db *pgxpool.Pool) error {
 }
 
 func readDumpFile() (string, error) {
-	data, err := os.ReadFile("../../util/testutil/dump.sql")
+	dump := "../util/testutil/dump.sql"
+	if _, err := os.Stat(dump); err != nil {
+		dump = "../../util/testutil/dump.sql"
+	}
+	data, err := os.ReadFile(dump)
 
 	if err != nil {
 		return "", err
