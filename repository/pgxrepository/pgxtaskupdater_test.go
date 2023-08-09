@@ -125,14 +125,14 @@ func (t *TestPgxUpdater) TestUpdateNotExistingTask() {
 }
 
 func (t *TestPgxUpdater) TestUpdateBelongingToOtherTask() {
-	notExistingTask := &pb.TaskToUpdate{
+	otherUserTask := &pb.TaskToUpdate{
 		Id:          6,
 		Title:       "new task title",
 		Description: "new task description",
 		Deadline:    1691998920,
 	}
 
-	_, err := t.updater.UpdateTask(t.ctx, notExistingTask, 1)
+	_, err := t.updater.UpdateTask(t.ctx, otherUserTask, 1)
 	t.NotNil(err)
 }
 
