@@ -11,7 +11,7 @@ service TaskService {
     rpc SetTaskCompleted(TaskId) returns (Task) {}
     rpc SetTaskUncompleted(TaskId) returns (Task) {}
     rpc UpdateTask(TaskToUpdate) returns (Task) {}
-    rpc DeleteTask(TaskId) returns (Task) {}
+    rpc DeleteTask(TaskId) returns (Empty) {}
 }
 
 message TaskRequest {
@@ -64,3 +64,5 @@ message TaskToUpdate {
     string description = 3;
     int64 deadline = 4;
 }
+
+message Empty {}
