@@ -32,7 +32,13 @@ INSERT INTO
     tasks (title, description, user_id, deadline, 
         created_at) 
     VALUES ('uncompleted task', 'description', -1, 1691998920, 1691491319);
+
 INSERT INTO 
     tasks (title, description, user_id, deadline, 
         created_at) 
     VALUES ('uncompleted task 3', 'description', 1, 1691998920, 1691491319);
+
+INSERT INTO 
+    tasks (title, description, user_id, deadline, 
+        created_at, deleted_at) 
+    VALUES ('deleted task', 'description', 1, 1691998920, 1691491319,  1691988920);
