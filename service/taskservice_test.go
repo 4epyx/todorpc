@@ -21,7 +21,7 @@ type TestTaskService struct {
 	suite.Suite
 	ctx     context.Context
 	db      *pgxpool.Pool
-	service service.TaskService
+	service *service.TaskService
 	once    sync.Once
 }
 
