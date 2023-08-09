@@ -16,8 +16,8 @@ type TaskService struct {
 	pb.UnimplementedTaskServiceServer
 }
 
-func NewTaskService(repo repository.TaskRepository) TaskService {
-	return TaskService{repo: repo}
+func NewTaskService(repo repository.TaskRepository) *TaskService {
+	return &TaskService{repo: repo}
 }
 
 func (t *TaskService) CreateTask(ctx context.Context, task *pb.TaskRequest) (*pb.Task, error) {
