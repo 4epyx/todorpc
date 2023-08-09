@@ -28,7 +28,7 @@ type TaskServiceClient interface {
 	SetTaskCompleted(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	SetTaskUncompleted(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
 	UpdateTask(ctx context.Context, in *TaskToUpdate, opts ...grpc.CallOption) (*Task, error)
-	DeleteTask(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error)
+	DeleteTask(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type taskServiceClient struct {
@@ -93,8 +93,8 @@ func (c *taskServiceClient) UpdateTask(ctx context.Context, in *TaskToUpdate, op
 	return out, nil
 }
 
-func (c *taskServiceClient) DeleteTask(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Task, error) {
-	out := new(Task)
+func (c *taskServiceClient) DeleteTask(ctx context.Context, in *TaskId, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/todo.TaskService/DeleteTask", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ type TaskServiceServer interface {
 	SetTaskCompleted(context.Context, *TaskId) (*Task, error)
 	SetTaskUncompleted(context.Context, *TaskId) (*Task, error)
 	UpdateTask(context.Context, *TaskToUpdate) (*Task, error)
-	DeleteTask(context.Context, *TaskId) (*Task, error)
+	DeleteTask(context.Context, *TaskId) (*Empty, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }
 
@@ -138,7 +138,7 @@ func (UnimplementedTaskServiceServer) SetTaskUncompleted(context.Context, *TaskI
 func (UnimplementedTaskServiceServer) UpdateTask(context.Context, *TaskToUpdate) (*Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTask not implemented")
 }
-func (UnimplementedTaskServiceServer) DeleteTask(context.Context, *TaskId) (*Task, error) {
+func (UnimplementedTaskServiceServer) DeleteTask(context.Context, *TaskId) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTask not implemented")
 }
 func (UnimplementedTaskServiceServer) mustEmbedUnimplementedTaskServiceServer() {}
