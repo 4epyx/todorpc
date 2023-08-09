@@ -29,5 +29,5 @@ type TaskUpdater interface {
 }
 
 type TaskDeleter interface {
-	DeleteTask(context.Context, int64 /*task id*/, int64 /*user id*/) (*pb.Task, error)
+	DeleteTask(context.Context, int64 /*task id*/, int64 /*user id*/) error
 }
