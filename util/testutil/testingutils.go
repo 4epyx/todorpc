@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
 	"os"
@@ -9,6 +10,9 @@ import (
 	"github.com/4epyx/todorpc/db"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
+
+//go:embed dump.sql
+var dumpFile string
 
 func GetAllTables(ctx context.Context, db *pgxpool.Pool) ([]string, error) {
 	res, err := db.Query(ctx, "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema'")
@@ -60,15 +64,15 @@ func LoadDump(ctx context.Context, db *pgxpool.Pool) error {
 }
 
 func readDumpFile() (string, error) {
-	dump := "../util/testutil/dump.sql"
-	if _, err := os.Stat(dump); err != nil {
-		dump = "../../util/testutil/dump.sql"
-	}
-	data, err := os.ReadFile(dump)
+	// dump := "../util/testutil/dump.sql"
+	// if _, err := os.Stat(dump); err != nil {
+	// 	dump = "../../util/testutil/dump.sql"
+	// }
+	// data, err := os.ReadFile(dump)
 
-	if err != nil {
-		return "", err
-	}
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	return string(data), nil
+	return dumpFile, nil
 }
